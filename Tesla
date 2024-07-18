@@ -1,0 +1,85 @@
+#QUESTION 1
+
+import yfinance as yf
+import pandas as pd
+
+# Fetch Tesla stock data
+tesla_stock = yf.Ticker("TSLA")
+
+# Download historical stock data
+tesla_data = tesla_stock.history(period="max")
+
+# Display the downoaded data
+tesla_data.head()
+
+
+#QUESTION 2
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm"
+html_data  = requests.get(url).text
+
+soup = BeautifulSoup(html_data, "html.parser")
+
+tesla_tables = soup.find_all('table')
+ 
+for index,table in enumerate(tesla_tables):
+    if ("Tesla Quarterly Revenue" in str(table)):
+        tesla_table_index = index
+ 
+tesla_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+ 
+for row in tesla_tables[tesla_table_index].tbody.find_all("tr"):
+    col = row.find_all("td")
+    if (col !=[]):
+        date = col[0].text
+        revenue = col[1].text.replace("$", "").replace(",", "")
+        new_row = pd.DataFrame({"Date": [date], "Revenue": [revenue]})
+        tesla_revenue = pd.concat([tesla_revenue, new_row], ignore_index=True)
+
+tesla_revenue.head()
+
+
+
+#QUESTION 5
+
+tesla_revenue = pd.DataFrame(columns=['Date','Revenue'])
+for row in soup.find_all('tbody')[1].find_all('tr'):
+    col = row.find_all('td')
+    Date = col[0].text
+    Revenue = col[1].text
+    tesla_revenue = tesla_revenue.append({'Date': Date, 'Revenue': Revenue}, ignore_index=True)
+
+tesla_revenue["Revenue"] = tesla_revenue['Revenue'].str.replace(',|\$',"")
+tesla_revenue.dropna(inplace=True)
+
+tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != ""]
+tesla_revenue.tail()
+
+
+#ERROR MESSAGE
+
+---------------------------------------------------------------------------
+AttributeError                            Traceback (most recent call last)
+~\AppData\Local\Temp\ipykernel_11772\719015816.py in ?()
+      2 for row in soup.find_all('tbody')[1].find_all('tr'):
+      3     col = row.find_all('td')
+      4     Date = col[0].text
+      5     Revenue = col[1].text
+----> 6     tesla_revenue = tesla_revenue.concat({'Date': Date, 'Revenue': Revenue}, ignore_index=True)
+      7 
+      8 tesla_revenue["Revenue"] = tesla_revenue['Revenue'].str.replace(',|\$',"")
+      9 tesla_revenue.dropna(inplace=True)
+
+~\Downloads\Programs\Lib\site-packages\pandas\core\generic.py in ?(self, name)
+   6200             and name not in self._accessors
+   6201             and self._info_axis._can_hold_identifiers_and_holds_name(name)
+   6202         ):
+   6203             return self[name]
+-> 6204         return object.__getattribute__(self, name)
+
+AttributeError: 'DataFrame' object has no attribute 'concat'
+
