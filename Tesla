@@ -44,7 +44,7 @@ tesla_revenue.head()
 
 
 
-#QUESTION 5
+#QUESTION 5: Tesla Stock and Revenue Dashboard
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
